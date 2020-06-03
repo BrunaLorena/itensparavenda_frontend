@@ -1,39 +1,37 @@
 import React, { useState, useMemo } from 'react';
 import Header from './Header';
 import api from './api';
-import{ interval } from 'rxjs';
+import { Table, TableRow, TableCell, Switch, Button} from '@material-ui/core';
 
-function ListaPage() {
+function ListaPage() { 
 
-    const [produtos, setProdutos ] = useState([]);
-    const [loading, setLoading ] = useState(true);
-    
-  async function loadData() {
-      const response = await api.get('/');
-      setProdutos (response.data);
-      setLoading(false);
+    const [ itens, setitens ] = useState([]);
+
+    async function loadData() { 
+        const response = await api.get('/');
+        setitens(response.data);
     }
 
     useMemo(loadData, []);
 
-    return <div>
+    return <>
         <Header/>
-        { loading == true
-        ? <span> Carregando Lista...</span>
-        : <table>
-           { 
-               produtos.map(item => (
-                   <tr>
-                       <td>{item.id}</td>
-                       <td>{item.item}</td>
-                       <td>{item.valor}</td>
-                       <td>{item.tamanho}</td>
-                   </tr>
-               ))
+        <Table style={{marginTop: '80px', marginBottom: '20px'}}>
+            {
+                itens.map(item => (
+                    <TableRow>
+                        <TableCell>{item.id}</TableCell>
+                        <TableCell style={{width: '70%'}}>{item.item}</TableCell>
+                        <TableCell>{item.valor}</TableCell>
+                        <TableCell>{item.tamanho}</TableCell>
+                       
+                    </TableRow>
+                ))
             }
-        </table>
-        }
-    </div> 
+        </Table>
+
+        <Button variant="contained" color="primary">Adicionar</Button>
+    </>
 }
 
 export default ListaPage;
