@@ -1,7 +1,8 @@
 import React from 'react';
+import {AppBar} from '@material-ui/core/AppBar';
 
 function Header(){
-     return <h1>Itens para Venda</h1>
-
+   /*  return <AppBar
+*/
 }
 export default Header;

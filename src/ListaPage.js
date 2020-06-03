@@ -1,24 +1,26 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState, useMemo } from 'react';
 import Header from './Header';
 import api from './api';
+import{ interval } from 'rxjs';
 
 function ListaPage() {
 
     const [produtos, setProdutos ] = useState([]);
-    const [numero, setNumero ] = useState([1]);
+    const [loading, setLoading ] = useState(true);
     
-  async function loadData(){
+  async function loadData() {
       const response = await api.get('/');
-      const produtos = response.data;
+      setProdutos (response.data);
+      setLoading(false);
+    }
 
-      setProdutos(produtos);
-       }
+    useMemo(loadData, []);
 
-    useEffect(loadData,[]);
-
-     return <div>
+    return <div>
         <Header/>
-        <table>
+        { loading == true
+        ? <span> Carregando Lista...</span>
+        : <table>
            { 
                produtos.map(item => (
                    <tr>
@@ -30,7 +32,8 @@ function ListaPage() {
                ))
             }
         </table>
-     </div> 
+        }
+    </div> 
 }
 
 export default ListaPage;
