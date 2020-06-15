@@ -98,7 +98,7 @@ function ListaPage() {
                 color="primary">Adicionar</Button>
 
         <Dialog open={open} onClose={closeDialog}>
-            <DialogTitle>{id === 0 ? 'Novo Produto': 'Editar'} Item </DialogTitle>
+            <DialogTitle>{id === 0 ? 'Novo': 'Editar'} Item </DialogTitle>
             <DialogContent>{id === 0 ? 'Cadastrar': 'Edita'} Novo Item:
                 <TextField
                     autoFocus
