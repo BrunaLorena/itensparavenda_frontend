@@ -1,20 +1,25 @@
 import React, { useState, useMemo } from 'react';
 import Header from './Header';
 import api from './api';
-import { Table, TableRow, TableCell, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField } from '@material-ui/core';
+import { Table, TableRow, TableCell, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 function ListaPage() { 
 
-    const [ item, setItem ] = useState([]);
+    const [ itensparavenda, setItensparavenda ] = useState([]);
+    const [ item, setItem ] = useState('');
     const [ open, setOpen ] = useState(false);
-    const [ Valor, setValor ] = useState([]);
-    const [ Tamanho, setTamanho ] = useState([]);
- 
+    const [ valor, setValor ] = useState( );
+    const [ tamanho, setTamanho ] = useState('');
+    const [ id, setId ] = useState(0);
+    
 
     async function loadData() { 
-        const response = await api.get('/');
-        setItem(response.data);
+
+       const response = await api.get('/').then(response => {
+            const itensparavenda = response.data;
+            setItensparavenda(itensparavenda);
+        })
     }
 
     useMemo(loadData, []);
@@ -28,54 +33,77 @@ function ListaPage() {
     }
 
     async function salvar() { 
-        await api.post('/', { Item, Valor, Tamanho }); 
+        if(id === 0) {
+        await api.post('/', { item, valor, tamanho }); 
+        }
+        else {
+             await api.put(`/${id}`, { item, valor, tamanho });
+        }
+
         loadData();
         setItem('');
         setValor();
         setTamanho('');
+        setId(0);
         closeDialog();
     }
 
-     async function apagar(id) { 
+      async function apagar(id) {
         await api.delete(`/${id}`);
         loadData();
     }
-    return <>
-        <Header/>
-        <Table style={{marginTop: '80px', marginBottom: '20px'}}>
-            {
-                item.map(item => (
+
+    async function editar(itensparavenda) {
+        setItem(itensparavenda.item);
+        setValor(itensparavenda.valor);
+        setTamanho(itensparavenda.tamanho);
+        setId(itensparavenda.id);
+        openDialog();
+    }
+
+  return (
+        <>
+            <Header />
+            <Table style={{ marginTop: '80px' }}>
+
+                {
+                itensparavenda.map(setItensparavenda => (
                     <TableRow>
-                        <TableCell>{item.id}</TableCell>
-                        <TableCell style={{width: '70%'}}>{item.Item}</TableCell>
-                        <TableCell>{item.Valor}</TableCell>
-                        <TableCell>{item.Tamanho}</TableCell>
-                     <Button 
-                                variant="outlined" 
-                                color="secondary" 
-                                size="small" 
-                                onClick={() => apagar(item.id)}>
-                                    <DeleteIcon/> Excluir
-                     </Button>  
-                     </TableRow>   
-                ))
-            }
-        </Table>
-        <Button 
-            onClick={openDialog}
-            variant="contained" 
-            color="secondary">
-                Adicionar
-        </Button>
+                        <TableCell>{itensparavenda.id}</TableCell>
+                        <TableCell>{itensparavenda.item}</TableCell>
+                        <TableCell>{itensparavenda.valor}</TableCell>
+                        <TableCell>{itensparavenda.tamanho}</TableCell>
+                     <Button variant="outlined"
+                                    color="secondary"
+                                    size="small"
+                                    onClick={() => apagar(item.id)}>
+                                    <DeleteIcon />Apagar
+                                    </Button>
+                    
+                            <TableCell>
+                                <Button variant="outlined"
+                                    color="secondary"
+                                    size="small"
+                                    onClick={() => editar(item)}>
+                                    Editar
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    ))
+                }
+            </Table>
+        <Button
+                onClick={openDialog}
+                variant="contained"
+                color="primary">Adicionar</Button>
 
         <Dialog open={open} onClose={closeDialog}>
-            <DialogTitle>Novo Produto</DialogTitle>
-            <DialogContent>
-                <DialogContentText>Preencha os dados para cadastrar um novo produto.</DialogContentText>
+            <DialogTitle>{id === 0 ? 'Novo Produto': 'Editar'} Item </DialogTitle>
+            <DialogContent>{id === 0 ? 'Cadastrar': 'Edita'} Novo Item:
                 <TextField
                     autoFocus
                     margin="dense"
-                    id="Item"
+                    id="item"
                     label="Item"
                     type="text"
                     fullWidth
@@ -84,11 +112,11 @@ function ListaPage() {
                 />
                 <TextField
                     margin="dense"
-                    id="Valor"
+                    id="valor"
                     label="Valor"
-                    type="number"
+                    type="text"
                     fullWidth
-                    value={Valor}
+                    value={valor}
                     onChange={e => setValor(e.target.value)}
                 />
                 <TextField
@@ -97,18 +125,20 @@ function ListaPage() {
                     label="Tamanho"
                     type="text"
                     fullWidth
-                    value={Tamanho}
+                    value={tamanho}
                     onChange={e => setTamanho(e.target.value)}
                 />
             </DialogContent>
             <DialogActions>
                 <Button onClick={closeDialog}>Cancelar</Button>
-                <Button onClick={salvar}>Salvar</Button>
+                <Button onClick={salvar}>{id === 0 ? 'Salvar' : 'Atualizar'}</Button>
             </DialogActions>
         </Dialog>
 
         
     </>
+  )
+
 }
 
 export default ListaPage;
