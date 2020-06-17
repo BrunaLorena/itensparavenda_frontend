@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL:'// https://itensparavenda.herokuapp.com/itens'
+    baseURL:'https://itensparavenda-backend.herokuapp.com'
 })
 
 export default api;

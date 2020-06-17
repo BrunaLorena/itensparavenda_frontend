@@ -9,17 +9,16 @@ function ListaPage() {
     const [ itensparavenda, setItensparavenda ] = useState([]);
     const [ item, setItem ] = useState('');
     const [ open, setOpen ] = useState(false);
-    const [ valor, setValor ] = useState( );
+    const [ valor, setValor ] = useState(0);
     const [ tamanho, setTamanho ] = useState('');
     const [ id, setId ] = useState(0);
     
 
     async function loadData() { 
 
-       const response = await api.get('/').then(response => {
+       const response = await api.get('/itens');
             const itensparavenda = response.data;
             setItensparavenda(itensparavenda);
-        })
     }
 
     useMemo(loadData, []);
@@ -34,10 +33,10 @@ function ListaPage() {
 
     async function salvar() { 
         if(id === 0) {
-        await api.post('/', { item, valor, tamanho }); 
+        await api.post('/itens', { item, valor, tamanho }); 
         }
         else {
-             await api.put(`/${id}`, { item, valor, tamanho });
+             await api.put(`/itens/${id}`, { item, valor, tamanho });
         }
 
         loadData();
@@ -49,7 +48,7 @@ function ListaPage() {
     }
 
       async function apagar(id) {
-        await api.delete(`/${id}`);
+        await api.delete(`/itens/${id}`);
         loadData();
     }
 
@@ -67,19 +66,20 @@ function ListaPage() {
             <Table style={{ marginTop: '80px' }}>
 
                 {
-                itensparavenda.map(setItensparavenda => (
+                itensparavenda.map(item => (
                     <TableRow>
-                        <TableCell>{itensparavenda.id}</TableCell>
-                        <TableCell>{itensparavenda.item}</TableCell>
-                        <TableCell>{itensparavenda.valor}</TableCell>
-                        <TableCell>{itensparavenda.tamanho}</TableCell>
-                     <Button variant="outlined"
+                        <TableCell>{item.id}</TableCell>
+                        <TableCell>{item.item}</TableCell>
+                        <TableCell>{item.valor}</TableCell>
+                        <TableCell>{item.tamanho}</TableCell>
+                         <TableCell>
+                             <Button variant="outlined"
                                     color="secondary"
                                     size="small"
                                     onClick={() => apagar(item.id)}>
                                     <DeleteIcon />Apagar
                                     </Button>
-                    
+                         </TableCell>
                             <TableCell>
                                 <Button variant="outlined"
                                     color="secondary"
